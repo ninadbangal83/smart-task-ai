@@ -6,13 +6,16 @@ const envSchema = z.object({
   PORT: z.string().default('3000').transform(Number),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   
-  // Database
+  // Infrastructure Toggles
   DB_TYPE: z.enum(['MONGO', 'POSTGRES']).default('MONGO'),
-  MONGO_URI: z.string().optional(),
+  BROKER_TYPE: z.enum(['RABBITMQ', 'KAFKA', 'BULLMQ']).default('RABBITMQ'),
+  
+  // Connection Strings
+  MONGO_URI: z.string().default('mongodb://localhost:27017/smart_task_ai'),
   POSTGRES_URI: z.string().optional(),
-
-  // Broker
-  BROKER_TYPE: z.enum(['RABBITMQ', 'BULLMQ', 'KAFKA']).default('RABBITMQ'),
+  REDIS_URL: z.string().default('redis://localhost:6379'),
+  RABBITMQ_URL: z.string().default('amqp://localhost:5672'),
+  KAFKA_URL: z.string().default('localhost:9092'),
   AUTH_TYPE: z.enum(['JWT', 'SESSION']).default('JWT'),
   RABBITMQ_URI: z.string().optional(),
 
@@ -22,6 +25,9 @@ const envSchema = z.object({
   // Redis
   REDIS_HOST: z.string().default('localhost'),
   REDIS_PORT: z.string().default('6379').transform(Number),
+
+  // Observability Swapper
+  LOGGER_TYPE: z.enum(['WINSTON', 'PINO']).default('WINSTON'),
 });
 
 // 2. Parse and Validate

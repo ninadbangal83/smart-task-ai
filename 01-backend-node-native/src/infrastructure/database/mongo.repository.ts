@@ -29,16 +29,16 @@ export class MongoTaskRepository implements ITaskRepository {
   }
 
   async findById(id: string, userId?: string): Promise<Task | null> {
-    const query: any = { _id: id };
+    const query: Record<string, unknown> = { _id: id };
     if (userId) query.userId = userId;
-    const found = await TaskModel.findOne(query);
+    const found = await TaskModel.findOne(query as any);
     return found ? this.mapToEntity(found) : null;
   }
 
   async findAll(userId?: string): Promise<Task[]> {
-    const query: any = {};
+    const query: Record<string, unknown> = {};
     if (userId) query.userId = userId;
-    const list = await TaskModel.find(query);
+    const list = await TaskModel.find(query as any);
     return list.map(this.mapToEntity);
   }
 

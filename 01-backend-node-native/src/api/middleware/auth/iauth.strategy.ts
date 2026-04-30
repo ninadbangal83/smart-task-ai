@@ -6,6 +6,6 @@ export interface IAuthStrategy {
   authenticate(req: IncomingMessage, res: ServerResponse): Promise<User | null>;
   
   // 2. Used in Login/Register to "Attach" the identity (Token or Cookie)
-  onAuthSuccess(res: ServerResponse, user: User): any;
+  onAuthSuccess(res: ServerResponse, user: User): Record<string, unknown>;
 }
 

@@ -14,8 +14,12 @@ export class JWTAuthStrategy implements IAuthStrategy {
     return decoded || null;
   }
 
-  onAuthSuccess(res: ServerResponse, user: User): any {
-    const token = AuthUtil.generateToken({ id: user.id, email: user.email });
+  onAuthSuccess(res: ServerResponse, user: User): Record<string, unknown> {
+    const token = AuthUtil.generateToken({ 
+      id: user.id, 
+      email: user.email, 
+      role: user.role 
+    });
     res.setHeader('X-Auth-Token', token);
     return { token };
   }

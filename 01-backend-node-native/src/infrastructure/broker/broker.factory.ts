@@ -1,29 +1,23 @@
 import { config } from '@config/app.config';
-import { IBroker } from './ibroker';
-import { RabbitMQService } from './rabbitmq.service';
-import { BullMQService } from './bullmq.service';
-import { KafkaService } from './kafka.service';
+import { IBroker } from '@domain/brokers/ibroker';
+import { RabbitMQBroker } from './rabbitmq.broker';
+import { KafkaBroker } from './kafka.broker';
+import { BullMQBroker } from './bullmq.broker';
 
 export class BrokerFactory {
-  private static instance: IBroker;
+  private static instance: IBroker | null = null;
 
   static getBroker(): IBroker {
     if (this.instance) return this.instance;
 
-    const brokerType = config.BROKER_TYPE;
+    const type = config.BROKER_TYPE.toUpperCase();
 
-    switch (brokerType.toUpperCase()) {
-      case 'RABBITMQ':
-        this.instance = new RabbitMQService();
-        break;
-      case 'BULLMQ':
-        this.instance = new BullMQService();
-        break;
-      case 'KAFKA':
-        this.instance = new KafkaService();
-        break;
-      default:
-        throw new Error(`Unsupported broker type: ${brokerType}`);
+    if (type === 'KAFKA') {
+      this.instance = new KafkaBroker();
+    } else if (type === 'BULLMQ') {
+      this.instance = new BullMQBroker();
+    } else {
+      this.instance = new RabbitMQBroker();
     }
 
     return this.instance;

@@ -1,9 +1,14 @@
+export type UserRole = 'user' | 'admin';
+
 export interface User {
   id: string;
   email: string;
-  password?: string; // Optional because we don't return it in API
+  password?: string;
   name: string;
-  createdAt: Date;
+  role: UserRole;
+  createdAt?: Date;
 }
 
-export type CreateUserDto = Pick<User, 'email' | 'name' | 'password'>;
+export type CreateUserDto = Partial<User> & { email: string; password?: string };
+
+export type LoginDto = { email: string; password: string };

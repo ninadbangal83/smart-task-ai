@@ -21,11 +21,11 @@ export class SessionAuthStrategy implements IAuthStrategy {
     return sessionData || null;
   }
 
-  onAuthSuccess(res: ServerResponse, user: User): any {
+  onAuthSuccess(res: ServerResponse, user: User): Record<string, unknown> {
     const sessionId = crypto.randomBytes(32).toString('hex');
     
     // Store in Redis (1 day expiry)
-    RedisService.set(`session:${sessionId}`, user, 86400);
+    RedisService.set( `session:${sessionId}`, user, 86400);
 
     // Set HttpOnly Cookie (Security!)
     res.setHeader('Set-Cookie', `sid=${sessionId}; HttpOnly; Path=/; Max-Age=86400; SameSite=Lax`);

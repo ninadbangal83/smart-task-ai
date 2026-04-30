@@ -4,15 +4,32 @@ import path from 'path';
 import { config } from '@config/app.config';
 import { handleTaskRoutes } from '@api/routes/task.routes';
 import { handleAuthRoutes } from '@api/routes/auth.routes';
+import { handleUserRoutes } from '@api/routes/user.routes';
 import { AppError } from '@shared/errors/app.error';
 import { logger } from '@shared/utils/logger';
+import { initPostgres } from '@infra/database/postgres.init';
 
 const PORT = config.PORT;
 
-
 const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
-  // Global Headers
+  // 1. High-Precision Request Tracking (Pure Native)
+  const start = process.hrtime();
+  res.on('finish', () => {
+    const [seconds, nanoseconds] = process.hrtime(start);
+    const durationInMs = (seconds * 1000 + nanoseconds / 1e6).toFixed(2);
+    const logMsg = `${req.method} ${req.url} ${res.statusCode} - ${durationInMs}ms`;
+    
+    if (res.statusCode >= 400) logger.error(logMsg);
+    else logger.info(logMsg);
+  });
+
+  // 2. Global Security Headers (Native Helmet)
   res.setHeader('Content-Type', 'application/json');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('Content-Security-Policy', "default-src 'self'");
   res.setHeader('X-Powered-By', 'SmartTask-Native-Core');
 
   const { method, url } = req;
@@ -33,8 +50,12 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
     // 2. Dispatch to Task Routes (Protected)
     const taskHandled = await handleTaskRoutes(req, res);
     if (taskHandled) return;
+
+    // 3. Dispatch to User/Admin Routes (Mixed)
+    const userHandled = await handleUserRoutes(req, res);
+    if (userHandled) return;
     
-    // 3. If no route handled the request, it's a 404
+    // 4. If no route handled the request, it's a 404
     res.writeHead(404);
     res.end(JSON.stringify({ message: `Route ${req.method} ${req.url} not found` }));
 
@@ -61,6 +82,9 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
 // Initialization Logic (Industrial standard)
 const startServer = async () => {
   try {
+    // 1. Initialize Infrastructure
+    await initPostgres();
+    
     logger.info(`📡 Initializing ${config.DB_TYPE} database...`);
     
     server.listen(PORT, () => {
