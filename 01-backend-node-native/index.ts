@@ -8,6 +8,7 @@ import { handleUserRoutes } from '@api/routes/user.routes';
 import { AppError } from '@shared/errors/app.error';
 import { logger } from '@shared/utils/logger';
 import { initPostgres } from '@infra/database/postgres.init';
+import { initMongo } from '@infra/database/mongo.init';
 
 const PORT = config.PORT;
 
@@ -83,9 +84,13 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
 const startServer = async () => {
   try {
     // 1. Initialize Infrastructure
-    await initPostgres();
-    
     logger.info(`📡 Initializing ${config.DB_TYPE} database...`);
+
+    if (config.DB_TYPE === 'POSTGRES') {
+      await initPostgres();
+    } else {
+      await initMongo();
+    }
     
     server.listen(PORT, () => {
       logger.info(`🚀 SmartTask Industrial Native Server running on port ${PORT}`);
