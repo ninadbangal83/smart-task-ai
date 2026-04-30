@@ -1,27 +1,21 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { AuthUtil } from '@shared/utils/auth.util';
 import { ResponseUtil } from '@shared/utils/response.util';
+import { AuthFactory } from './auth/auth.factory';
 
 export const protect = async (
   req: IncomingMessage, 
   res: ServerResponse, 
   next: () => Promise<any>
 ) => {
-  const authHeader = req.headers.authorization;
+  const strategy = AuthFactory.getStrategy();
+  const user = await strategy.authenticate(req, res);
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return ResponseUtil.error(res, 'Unauthorized: No token provided', 401);
+  if (!user) {
+    return ResponseUtil.error(res, 'Unauthorized: Access Denied', 401);
   }
 
-  const token = authHeader.split(' ')[1];
-  const decoded = AuthUtil.verifyToken(token);
-
-  if (!decoded) {
-    return ResponseUtil.error(res, 'Unauthorized: Invalid or expired token', 401);
-  }
-
-  // Attach user info to request (Hack for Native Node)
-  (req as any).user = decoded;
+  // Attach user info to request
+  (req as any).user = user;
   
   return await next();
 };

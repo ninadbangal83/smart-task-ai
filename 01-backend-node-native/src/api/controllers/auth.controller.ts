@@ -7,7 +7,7 @@ export class AuthController {
   static async register(req: IncomingMessage, res: ServerResponse) {
     try {
       const body = await RequestUtil.getBody<any>(req);
-      const result = await AuthService.register(body);
+      const result = await AuthService.register(body, res);
       ResponseUtil.success(res, result, 201);
     } catch (err: any) {
       AuthController.handleError(res, err);
@@ -17,7 +17,7 @@ export class AuthController {
   static async login(req: IncomingMessage, res: ServerResponse) {
     try {
       const { email, password } = await RequestUtil.getBody<any>(req);
-      const result = await AuthService.login(email, password);
+      const result = await AuthService.login(email, password, res);
       ResponseUtil.success(res, result);
     } catch (err: any) {
       AuthController.handleError(res, err);

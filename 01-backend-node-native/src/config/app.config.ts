@@ -13,6 +13,7 @@ const envSchema = z.object({
 
   // Broker
   BROKER_TYPE: z.enum(['RABBITMQ', 'BULLMQ', 'KAFKA']).default('RABBITMQ'),
+  AUTH_TYPE: z.enum(['JWT', 'SESSION']).default('JWT'),
   RABBITMQ_URI: z.string().optional(),
 
   // Auth
