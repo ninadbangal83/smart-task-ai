@@ -7,21 +7,24 @@ import { logger } from '@shared/utils/logger';
 
 export class TaskController {
   static async getAll(req: IncomingMessage, res: ServerResponse) {
-    const tasks = await TaskService.getAllTasks();
+    const userId = (req as any).user.id;
+    const tasks = await TaskService.getAllTasks(userId);
     ResponseUtil.success(res, tasks);
   }
 
   static async getById(req: IncomingMessage, res: ServerResponse, id: string) {
-    const task = await TaskService.getTaskById(id);
+    const userId = (req as any).user.id;
+    const task = await TaskService.getTaskById(id, userId);
     ResponseUtil.success(res, task);
   }
 
   static async create(req: IncomingMessage, res: ServerResponse) {
     try {
+      const userId = (req as any).user.id;
       const { title, description } = await RequestUtil.getBody<{ title: string, description: string }>(req);
       if (!title) throw new BadRequestError('Title is required');
 
-      const task = await TaskService.createTask({ title, description });
+      const task = await TaskService.createTask({ title, description, userId } as any);
       ResponseUtil.success(res, task, 201);
     } catch (err: any) {
       TaskController.handleError(res, err);
@@ -30,8 +33,9 @@ export class TaskController {
 
   static async update(req: IncomingMessage, res: ServerResponse, id: string) {
     try {
+      const userId = (req as any).user.id;
       const data = await RequestUtil.getBody<any>(req);
-      const task = await TaskService.updateTask(id, data);
+      const task = await TaskService.updateTask(id, userId, data);
       ResponseUtil.success(res, task);
     } catch (err: any) {
       TaskController.handleError(res, err);
@@ -39,7 +43,8 @@ export class TaskController {
   }
 
   static async delete(req: IncomingMessage, res: ServerResponse, id: string) {
-    await TaskService.deleteTask(id);
+    const userId = (req as any).user.id;
+    await TaskService.deleteTask(id, userId);
     ResponseUtil.success(res, null, 204);
   }
 

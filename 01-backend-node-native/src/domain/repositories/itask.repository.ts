@@ -1,9 +1,9 @@
-import { Task, CreateTaskDto } from '@domain-types/task.types';
+import { Task } from '@domain-types/task.types';
 
 export interface ITaskRepository {
-  create(data: CreateTaskDto): Promise<Task>;
-  findById(id: string): Promise<Task | null>;
-  findAll(): Promise<Task[]>;
-  update(id: string, data: Partial<Task>): Promise<Task>;
+  create(task: Task): Promise<Task>;
+  findById(id: string, userId?: string): Promise<Task | null>;
+  findAll(userId?: string): Promise<Task[]>;
+  update(id: string, task: Partial<Task>): Promise<Task>;
   delete(id: string): Promise<void>;
 }

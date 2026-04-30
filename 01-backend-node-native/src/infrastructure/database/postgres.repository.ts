@@ -19,14 +19,20 @@ export class PostgresTaskRepository implements ITaskRepository {
     return res.rows[0];
   }
 
-  async findById(id: string): Promise<Task | null> {
-    const res = await this.pool.query('SELECT * FROM tasks WHERE id = $1', [id]);
-    return res.rows[0] || null;
+  async findById(id: string, userId?: string): Promise<Task | null> {
+    const sql = userId 
+      ? 'SELECT * FROM tasks WHERE id = $1 AND userId = $2' 
+      : 'SELECT * FROM tasks WHERE id = $1';
+    const params = userId ? [id, userId] : [id];
+    const { rows } = await this.pool.query(sql, params);
+    return rows[0] || null;
   }
 
-  async findAll(): Promise<Task[]> {
-    const res = await this.pool.query('SELECT * FROM tasks');
-    return res.rows;
+  async findAll(userId?: string): Promise<Task[]> {
+    const sql = userId ? 'SELECT * FROM tasks WHERE userId = $1' : 'SELECT * FROM tasks';
+    const params = userId ? [userId] : [];
+    const { rows } = await this.pool.query(sql, params);
+    return rows;
   }
 
   async update(id: string, data: Partial<Task>): Promise<Task> {
