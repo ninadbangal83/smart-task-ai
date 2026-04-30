@@ -21,7 +21,7 @@ export class SessionAuthStrategy implements IAuthStrategy {
     return sessionData || null;
   }
 
-  onAuthSuccess(res: ServerResponse, user: User): void {
+  onAuthSuccess(res: ServerResponse, user: User): any {
     const sessionId = crypto.randomBytes(32).toString('hex');
     
     // Store in Redis (1 day expiry)
@@ -29,5 +29,8 @@ export class SessionAuthStrategy implements IAuthStrategy {
 
     // Set HttpOnly Cookie (Security!)
     res.setHeader('Set-Cookie', `sid=${sessionId}; HttpOnly; Path=/; Max-Age=86400; SameSite=Lax`);
+
+    return { session: 'active' };
   }
 }
+

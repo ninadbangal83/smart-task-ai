@@ -16,9 +16,9 @@ export class AuthService {
     const user = await userRepo.create({ ...data, password: hashedPassword });
     
     // Use Strategy to handle success (Token or Cookie)
-    AuthFactory.getStrategy().onAuthSuccess(res, user);
+    const authData = AuthFactory.getStrategy().onAuthSuccess(res, user);
     
-    return { user };
+    return { user, ...authData };
   }
 
   static async login(email: string, password: string, res: ServerResponse) {
@@ -29,8 +29,8 @@ export class AuthService {
     if (!isValid) throw new UnauthorizedError('Invalid credentials');
 
     // Use Strategy to handle success (Token or Cookie)
-    AuthFactory.getStrategy().onAuthSuccess(res, user);
+    const authData = AuthFactory.getStrategy().onAuthSuccess(res, user);
     
-    return { user };
+    return { user, ...authData };
   }
 }
