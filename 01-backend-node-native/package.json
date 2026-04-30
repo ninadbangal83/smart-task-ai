@@ -1,0 +1,14 @@
+{
+  "name": "01-backend-node-native",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "SmartTask AI - Native Node.js Implementation",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
