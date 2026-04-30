@@ -1,108 +1,54 @@
 import http, { IncomingMessage, ServerResponse } from 'http';
-import { EventEmitter } from 'events';
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import 'dotenv/config';
+import { handleTaskRoutes } from '@api/routes/task.routes';
+import { AppError } from '@shared/errors/app.error';
 
-// 1. Types & Interfaces
-interface Task {
-  id: number;
-  title: string;
-  status: 'pending' | 'in-progress' | 'completed';
-}
+const PORT = process.env.PORT || 3000;
 
-// 2. ESM Setup for __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const DATA_FILE = path.join(__dirname, 'tasks.json');
-
-// 3. EventEmitter for Task Tracking
-const taskEmitter = new EventEmitter();
-
-taskEmitter.on('taskCreated', (task: Task) => {
-  console.log(`[EVENT]: Task Created - ID: ${task.id}, Title: ${task.title}`);
-});
-
-// 4. Initialize JSON file if it doesn't exist
-const initDb = async (): Promise<void> => {
-  try {
-    await fs.access(DATA_FILE);
-  } catch {
-    await fs.writeFile(DATA_FILE, JSON.stringify([]));
-  }
-};
-
-// 5. Helper to read/write tasks
-const getTasks = async (): Promise<Task[]> => {
-  const content = await fs.readFile(DATA_FILE, 'utf-8');
-  return JSON.parse(content);
-};
-
-const saveTasks = async (tasks: Task[]): Promise<void> => {
-  await fs.writeFile(DATA_FILE, JSON.stringify(tasks, null, 2));
-};
-
-// 6. Creating the Server (Native HTTP)
 const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
-  const { method, url } = req;
-
-  // Set default response headers
+  // Global Headers
   res.setHeader('Content-Type', 'application/json');
+  res.setHeader('X-Powered-By', 'SmartTask-Native-Core');
 
   try {
-    // --- ROUTE: GET /tasks ---
-    if (url === '/tasks' && method === 'GET') {
-      const tasks = await getTasks();
-      res.writeHead(200);
-      res.end(JSON.stringify(tasks));
-    } 
+    // 1. Dispatch to Task Routes
+    const handled = await handleTaskRoutes(req, res);
     
-    // --- ROUTE: POST /tasks ---
-    else if (url === '/tasks' && method === 'POST') {
-      let body = '';
-      req.on('data', chunk => body += chunk);
-      
-      req.on('end', async () => {
-        try {
-          const { title } = JSON.parse(body);
-          if (!title) {
-            res.writeHead(400);
-            return res.end(JSON.stringify({ error: 'Title is required' }));
-          }
-
-          const tasks = await getTasks();
-          const newTask: Task = { id: Date.now(), title, status: 'pending' };
-          tasks.push(newTask);
-          
-          await saveTasks(tasks);
-          taskEmitter.emit('taskCreated', newTask); // Trigger Event
-
-          res.writeHead(201);
-          res.end(JSON.stringify(newTask));
-        } catch (err) {
-          res.writeHead(400);
-          res.end(JSON.stringify({ error: 'Invalid JSON' }));
-        }
-      });
-    }
-
-    // --- ROUTE: 404 NOT FOUND ---
-    else {
+    // 2. If no route handled the request, it's a 404
+    if (!handled) {
       res.writeHead(404);
-      res.end(JSON.stringify({ message: 'Route not found' }));
+      res.end(JSON.stringify({ message: `Route ${req.method} ${req.url} not found` }));
     }
 
-  } catch (error) {
-    // 7. Global Error Handling
-    console.error(error);
-    res.writeHead(500);
-    res.end(JSON.stringify({ message: 'Internal Server Error' }));
+
+  } catch (error: any) {
+    // Global Centralized Error Handler
+    const statusCode = error instanceof AppError ? error.statusCode : 500;
+    console.error(`[ERROR] ${error.message}`);
+    
+    res.writeHead(statusCode);
+    res.end(JSON.stringify({
+      status: 'error',
+      message: error.message || 'Something went wrong',
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    }));
   }
 });
 
-// Start Server
-const PORT = 3000;
-await initDb();
-server.listen(PORT, () => {
-  console.log(`🚀 SmartTask TS-Native Server running at http://localhost:${PORT}`);
-});
+// Initialization Logic (Industrial standard)
+const startServer = async () => {
+  try {
+    // Here we would initialize Redis, Mongo/Postgres pool, and Brokers
+    console.log(`📡 Initializing ${process.env.DB_TYPE} database...`);
+    
+    server.listen(PORT, () => {
+      console.log(`🚀 SmartTask Industrial Native Server running on port ${PORT}`);
+      console.log(`🔧 Mode: ${process.env.NODE_ENV || 'development'}`);
+    });
+  } catch (err) {
+    console.error('❌ Failed to start server:', err);
+    process.exit(1);
+  }
+};
+
+startServer();

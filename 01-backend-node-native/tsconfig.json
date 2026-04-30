@@ -1,12 +1,20 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "baseUrl": "./",
     "paths": {
-      "*": ["node_modules/*"]
+      "@api/*": ["src/api/*"],
+      "@domain/*": ["src/domain/*"],
+      "@infra/*": ["src/infrastructure/*"],
+      "@shared/*": ["src/shared/*"],
+      "@config/*": ["src/config/*"],
+      "@domain-types/*": ["src/domain/types/*"]
     },
+
+
+
     "types": ["node"],
     "allowJs": true,
     "checkJs": false,
