@@ -1,24 +1,30 @@
-import http from 'http';
+import http, { IncomingMessage, ServerResponse } from 'http';
 import { EventEmitter } from 'events';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// 1. ESM Setup for __dirname
+// 1. Types & Interfaces
+interface Task {
+  id: number;
+  title: string;
+  status: 'pending' | 'in-progress' | 'completed';
+}
+
+// 2. ESM Setup for __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const DATA_FILE = path.join(__dirname, 'tasks.json');
 
-// 2. EventEmitter for Task Tracking
+// 3. EventEmitter for Task Tracking
 const taskEmitter = new EventEmitter();
 
-taskEmitter.on('taskCreated', (task) => {
+taskEmitter.on('taskCreated', (task: Task) => {
   console.log(`[EVENT]: Task Created - ID: ${task.id}, Title: ${task.title}`);
 });
 
-// 3. Initialize JSON file if it doesn't exist
-const initDb = async () => {
+// 4. Initialize JSON file if it doesn't exist
+const initDb = async (): Promise<void> => {
   try {
     await fs.access(DATA_FILE);
   } catch {
@@ -26,12 +32,18 @@ const initDb = async () => {
   }
 };
 
-// 4. Helper to read/write tasks
-const getTasks = async () => JSON.parse(await fs.readFile(DATA_FILE, 'utf-8'));
-const saveTasks = async (tasks) => await fs.writeFile(DATA_FILE, JSON.stringify(tasks, null, 2));
+// 5. Helper to read/write tasks
+const getTasks = async (): Promise<Task[]> => {
+  const content = await fs.readFile(DATA_FILE, 'utf-8');
+  return JSON.parse(content);
+};
 
-// 5. Creating the Server (Native HTTP)
-const server = http.createServer(async (req, res) => {
+const saveTasks = async (tasks: Task[]): Promise<void> => {
+  await fs.writeFile(DATA_FILE, JSON.stringify(tasks, null, 2));
+};
+
+// 6. Creating the Server (Native HTTP)
+const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
   const { method, url } = req;
 
   // Set default response headers
@@ -53,10 +65,13 @@ const server = http.createServer(async (req, res) => {
       req.on('end', async () => {
         try {
           const { title } = JSON.parse(body);
-          if (!title) throw new Error('Title is required');
+          if (!title) {
+            res.writeHead(400);
+            return res.end(JSON.stringify({ error: 'Title is required' }));
+          }
 
           const tasks = await getTasks();
-          const newTask = { id: Date.now(), title, status: 'pending' };
+          const newTask: Task = { id: Date.now(), title, status: 'pending' };
           tasks.push(newTask);
           
           await saveTasks(tasks);
@@ -66,7 +81,7 @@ const server = http.createServer(async (req, res) => {
           res.end(JSON.stringify(newTask));
         } catch (err) {
           res.writeHead(400);
-          res.end(JSON.stringify({ error: err.message }));
+          res.end(JSON.stringify({ error: 'Invalid JSON' }));
         }
       });
     }
@@ -78,7 +93,7 @@ const server = http.createServer(async (req, res) => {
     }
 
   } catch (error) {
-    // 6. Global Error Handling
+    // 7. Global Error Handling
     console.error(error);
     res.writeHead(500);
     res.end(JSON.stringify({ message: 'Internal Server Error' }));
@@ -89,5 +104,5 @@ const server = http.createServer(async (req, res) => {
 const PORT = 3000;
 await initDb();
 server.listen(PORT, () => {
-  console.log(`🚀 SmartTask Native Server running at http://localhost:${PORT}`);
+  console.log(`🚀 SmartTask TS-Native Server running at http://localhost:${PORT}`);
 });

@@ -5,10 +5,16 @@
   "description": "SmartTask AI - Native Node.js Implementation",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js"
+    "start": "tsx index.ts",
+    "dev": "tsx --watch index.ts"
   },
+
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  }
 }
