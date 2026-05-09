@@ -25,7 +25,13 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
   });
 
   // 2. Global Security Headers & CORS (Native Helmet + CORS)
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
+  const allowedOrigins = ['http://localhost:5173', 'http://localhost:3004'];
+  const reqOrigin = req.headers.origin;
+  if (reqOrigin && allowedOrigins.includes(reqOrigin)) {
+    res.setHeader('Access-Control-Allow-Origin', reqOrigin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
+  }
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-Auth-Token');
