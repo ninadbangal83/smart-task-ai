@@ -23,6 +23,8 @@ export const ServerStatusAlert: React.FC = () => {
     serverName = 'Native Node.js Server';
   } else if (serverUrl.includes('3002')) {
     serverName = 'NestJS Enterprise Server';
+  } else if (serverUrl.includes('3003')) {
+    serverName = 'Java Spring Boot Enterprise Server';
   }
 
   return (

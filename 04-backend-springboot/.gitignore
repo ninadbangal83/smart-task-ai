@@ -1,0 +1,11 @@
+target/
+.maven-local/
+.mvn/
+*.class
+.project
+.classpath
+.settings/
+.idea/
+.vscode/
+*.log
+*.tmp

@@ -1,0 +1,37 @@
+server:
+  port: ${PORT:3003}
+
+spring:
+  application:
+    name: smart-task-ai-springboot
+
+  # MongoDB Connection Config
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://localhost:27017/smart_task_ai}
+
+    # Redis Connection Config (Used for caching and Session storage)
+    redis:
+      host: localhost
+      port: 6379
+
+  # JPA / Hibernate PostgreSQL Config
+  datasource:
+    url: jdbc:postgresql://localhost:5432/smart_task_ai
+    username: user
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+  # RabbitMQ Integration Config
+  rabbitmq:
+    host: localhost
+    port: 5672
+
+# Spring Session Configuration
+  session:
+    store-type: redis
+    redis:
+      namespace: spring:session

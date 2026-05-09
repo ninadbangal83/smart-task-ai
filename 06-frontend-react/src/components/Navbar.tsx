@@ -75,6 +75,17 @@ export const Navbar: React.FC = () => {
               <Cpu size={13} />
               NestJS (3002)
             </button>
+            <button
+              onClick={() => setServerUrl('http://localhost:3003')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium border transition-colors duration-150 ${
+                serverUrl === 'http://localhost:3003'
+                  ? 'bg-slate-800 text-slate-100 shadow-md border-slate-700/50'
+                  : 'bg-transparent text-slate-400 border-transparent hover:text-slate-200'
+              }`}
+            >
+              <Server size={13} />
+              SpringBoot (3003)
+            </button>
           </div>
 
           {/* Auth Strategy Badge (Auto-Discovered) */}
