@@ -111,91 +111,102 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Task Spawner (Task Form) */}
-      <TaskForm />
+      {/* 3. Main Workspace Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-4 border-t border-slate-800/40">
+        {/* Left Side: Tasks Feed (LG:col-span-8) */}
+        <div className="lg:col-span-8 space-y-6">
+          {/* Controls: Filter Toggles & Search Bar */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4 border-b border-slate-800/40">
+            {/* Search */}
+            <div className="relative w-full sm:w-72">
+              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Search orchestrations..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-xl pl-11 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none transition-all"
+              />
+            </div>
 
-      {/* 4. Controls: Filter Toggles & Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 max-w-4xl mx-auto pt-4 border-t border-slate-800/40">
-        
-        {/* Search */}
-        <div className="relative w-full sm:w-80">
-          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
-          <input
-            type="text"
-            placeholder="Search orchestrations..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-xl pl-11 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none transition-all"
-          />
+            {/* Filter Categories */}
+            <div className="flex items-center gap-1.5 p-1 bg-slate-900 border border-slate-800 rounded-xl text-xs w-full sm:w-auto">
+              <button
+                onClick={() => setFilter('all')}
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg font-bold transition-all ${
+                  filter === 'all'
+                    ? 'bg-slate-800 text-slate-100 shadow-md border border-slate-700/50'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <SlidersHorizontal size={12} />
+                All
+              </button>
+              <button
+                onClick={() => setFilter('pending')}
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg font-bold transition-all ${
+                  filter === 'pending'
+                    ? 'bg-slate-800 text-amber-400 shadow-md border border-slate-700/50'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Clock size={12} />
+                Pending
+              </button>
+              <button
+                onClick={() => setFilter('completed')}
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg font-bold transition-all ${
+                  filter === 'completed'
+                    ? 'bg-slate-800 text-emerald-400 shadow-md border border-slate-700/50'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <CheckSquare size={12} />
+                Completed
+              </button>
+            </div>
+          </div>
+
+          {/* Server Error Message Block */}
+          {error && (
+            <div className="text-xs text-rose-400 font-bold bg-rose-500/10 border border-rose-500/20 px-4 py-3 rounded-xl text-left">
+              ⚠️ {error}
+            </div>
+          )}
+
+          {/* Tasks Grid Listing */}
+          <div>
+            {isLoading && tasks.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+                <Loader2 className="animate-spin text-indigo-500 mb-4" size={36} />
+                <span className="text-sm font-semibold animate-pulse">Synchronizing Orchestration Logs...</span>
+              </div>
+            ) : filteredTasks.length === 0 ? (
+              <div className="border border-dashed border-slate-800 rounded-3xl p-16 text-center text-slate-400">
+                <LayoutGrid className="mx-auto text-slate-600 mb-4" size={40} />
+                <h3 className="font-bold text-slate-300 text-sm mb-1">No tasks detected</h3>
+                <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
+                  {searchQuery ? "No results match your search query." : "Spawn a new task above to initialize the orchestration pipeline."}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                {filteredTasks.map((task) => (
+                  <TaskCard key={task.id} task={task} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Filter Categories */}
-        <div className="flex items-center gap-1.5 p-1 bg-slate-900 border border-slate-800 rounded-xl text-xs w-full sm:w-auto">
-          <button
-            onClick={() => setFilter('all')}
-            className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg font-bold transition-all ${
-              filter === 'all'
-                ? 'bg-slate-800 text-slate-100 shadow-md border border-slate-700/50'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <SlidersHorizontal size={12} />
-            All
-          </button>
-          <button
-            onClick={() => setFilter('pending')}
-            className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg font-bold transition-all ${
-              filter === 'pending'
-                ? 'bg-slate-800 text-amber-400 shadow-md border border-slate-700/50'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Clock size={12} />
-            Pending
-          </button>
-          <button
-            onClick={() => setFilter('completed')}
-            className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg font-bold transition-all ${
-              filter === 'completed'
-                ? 'bg-slate-800 text-emerald-400 shadow-md border border-slate-700/50'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <CheckSquare size={12} />
-            Completed
-          </button>
+        {/* Right Side: Task Creator Panel (LG:col-span-4) */}
+        <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-4">
+          <div className="text-left space-y-1 pl-1">
+            <h2 className="text-sm font-extrabold text-slate-200 uppercase tracking-wide">Create Task Node</h2>
+            <p className="text-[11px] text-slate-500 leading-relaxed">Spawn a new task worker node into the cluster queue.</p>
+          </div>
+          <TaskForm />
         </div>
-      </div>
-
-      {/* 5. Server Error Message Block */}
-      {error && (
-        <div className="text-xs text-rose-400 font-bold bg-rose-500/10 border border-rose-500/20 px-4 py-3 rounded-xl max-w-4xl mx-auto text-left">
-          ⚠️ {error}
-        </div>
-      )}
-
-      {/* 6. Tasks Grid Listing */}
-      <div className="max-w-4xl mx-auto">
-        {isLoading && tasks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-400">
-            <Loader2 className="animate-spin text-indigo-500 mb-4" size={36} />
-            <span className="text-sm font-semibold animate-pulse">Synchronizing Orchestration Logs...</span>
-          </div>
-        ) : filteredTasks.length === 0 ? (
-          <div className="border border-dashed border-slate-800 rounded-3xl p-16 text-center text-slate-400">
-            <LayoutGrid className="mx-auto text-slate-600 mb-4" size={40} />
-            <h3 className="font-bold text-slate-300 text-sm mb-1">No tasks detected</h3>
-            <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
-              {searchQuery ? "No results match your search query." : "Spawn a new task above to initialize the orchestration pipeline."}
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {filteredTasks.map((task) => (
-              <TaskCard key={task.id} task={task} />
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );

@@ -18,8 +18,12 @@ export const ServerStatusAlert: React.FC = () => {
   }
 
   // Determine active port info
-  const isNative = serverUrl.includes('3000');
-  const serverName = isNative ? 'Native Node.js Server' : 'Express Server';
+  let serverName = 'Express Server';
+  if (serverUrl.includes('3000')) {
+    serverName = 'Native Node.js Server';
+  } else if (serverUrl.includes('3002')) {
+    serverName = 'NestJS Enterprise Server';
+  }
 
   return (
     <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-5 max-w-4xl mx-auto backdrop-blur-sm shadow-xl">

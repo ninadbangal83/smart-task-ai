@@ -27,7 +27,7 @@ export const TaskForm: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-4xl mx-auto shadow-xl backdrop-blur-sm">
+    <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl backdrop-blur-sm h-fit">
       <div className="flex flex-col gap-4 text-left">
         <div>
           <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5 pl-1">

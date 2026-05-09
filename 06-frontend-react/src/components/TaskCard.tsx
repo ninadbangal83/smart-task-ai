@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Task, useTaskStore } from '../stores/task.store';
+import { useTaskStore } from '../stores/task.store';
+import type { Task } from '../stores/task.store';
 import { CheckCircle2, Circle, Trash2, Edit2, X, Check, Calendar, AlertTriangle } from 'lucide-react';
 
 interface TaskCardProps {

@@ -10,7 +10,6 @@ export const Navbar: React.FC = () => {
     serverHealth, 
     isConnecting,
     setServerUrl, 
-    setAuthStrategy, 
     logout,
     checkServerHealth
   } = useAuthStore();
@@ -45,10 +44,10 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center gap-1.5 p-1 bg-slate-950 rounded-xl border border-slate-800 text-xs">
             <button
               onClick={() => setServerUrl('http://localhost:3000')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium border transition-colors duration-150 ${
                 serverUrl === 'http://localhost:3000'
-                  ? 'bg-slate-800 text-slate-100 shadow-md border border-slate-700/50'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-slate-800 text-slate-100 shadow-md border-slate-700/50'
+                  : 'bg-transparent text-slate-400 border-transparent hover:text-slate-200'
               }`}
             >
               <HardDrive size={13} />
@@ -56,41 +55,35 @@ export const Navbar: React.FC = () => {
             </button>
             <button
               onClick={() => setServerUrl('http://localhost:3001')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium border transition-colors duration-150 ${
                 serverUrl === 'http://localhost:3001'
-                  ? 'bg-slate-800 text-slate-100 shadow-md border border-slate-700/50'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-slate-800 text-slate-100 shadow-md border-slate-700/50'
+                  : 'bg-transparent text-slate-400 border-transparent hover:text-slate-200'
               }`}
             >
               <Server size={13} />
               Express (3001)
             </button>
+            <button
+              onClick={() => setServerUrl('http://localhost:3002')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium border transition-colors duration-150 ${
+                serverUrl === 'http://localhost:3002'
+                  ? 'bg-slate-800 text-slate-100 shadow-md border-slate-700/50'
+                  : 'bg-transparent text-slate-400 border-transparent hover:text-slate-200'
+              }`}
+            >
+              <Cpu size={13} />
+              NestJS (3002)
+            </button>
           </div>
 
-          {/* Auth Strategy Switcher */}
-          <div className="flex items-center gap-1.5 p-1 bg-slate-950 rounded-xl border border-slate-800 text-xs">
-            <button
-              onClick={() => setAuthStrategy('JWT')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
-                authStrategy === 'JWT'
-                  ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-slate-50 shadow-lg shadow-indigo-600/10'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Shield size={13} />
-              JWT Auth
-            </button>
-            <button
-              onClick={() => setAuthStrategy('SESSION')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
-                authStrategy === 'SESSION'
-                  ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-slate-50 shadow-lg shadow-indigo-600/10'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Shield size={13} />
-              Session Auth
-            </button>
+          {/* Auth Strategy Badge (Auto-Discovered) */}
+          <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-950 rounded-xl border border-slate-800 text-xs text-slate-400 font-medium">
+            <Shield size={13} className="text-indigo-400 animate-pulse" />
+            <span>Auth Protocol:</span>
+            <span className="font-extrabold text-indigo-400 uppercase tracking-wider font-mono">
+              {authStrategy}
+            </span>
           </div>
 
           {/* Health Status Badge */}

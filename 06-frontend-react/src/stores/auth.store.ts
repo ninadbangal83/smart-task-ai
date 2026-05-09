@@ -47,7 +47,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   setServerUrl: (url) => {
     localStorage.setItem(LOCAL_STORAGE_URL_KEY, url);
-    set({ serverUrl: url, serverHealth: null });
+    set({ serverUrl: url });
     get().checkServerHealth();
   },
 
@@ -85,6 +85,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const url = get().serverUrl;
       // Get the status from health endpoint
       const response = await axios.get(`${url}/health`, { timeout: 3000 });
+      
+      const serverStrategy = response.data.authStrategy;
+      if (serverStrategy && (serverStrategy === 'JWT' || serverStrategy === 'SESSION')) {
+        if (get().authStrategy !== serverStrategy) {
+          console.log(`%c[Auth Sync] Backend reported ${serverStrategy}. Auto-aligning frontend!`, 'color: #10b981; font-weight: bold;');
+          localStorage.setItem(LOCAL_STORAGE_STRATEGY_KEY, serverStrategy);
+          set({ authStrategy: serverStrategy });
+        }
+      }
+
       set({ 
         serverHealth: {
           status: response.data.status || 'UP',

@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # MongoDB - Default database choice (DB_TYPE=MONGO)
+  mongodb:
+    image: mongo:latest
+    container_name: smarttask-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+
+  # PostgreSQL - Alternative database choice (DB_TYPE=POSTGRES)
+  postgres:
+    image: postgres:latest
+    container_name: smarttask-postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: smart_task_ai
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # Redis - Used for Session Management & BullMQ Caching
+  redis:
+    image: redis:alpine
+    container_name: smarttask-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  # RabbitMQ - Message Broker (BROKER_TYPE=RABBITMQ)
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: smarttask-rabbitmq
+    ports:
+      - "5672:5672"       # AMQP Protocol port
+      - "15672:15672"     # Management Web UI port (User: guest / Pass: guest)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+  postgres_data:

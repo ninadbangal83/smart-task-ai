@@ -15,7 +15,10 @@ const app = express();
 
 // 1. Centralized Security & Parsing Middleware
 app.use(helmet()); 
-app.use(cors());   
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));   
 app.use(express.json()); 
 
 // 2. High-Precision Request Profiling (Express Middleware)
@@ -34,7 +37,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // 3. Health Check
 app.get('/health', (req: Request, res: Response) => {
-  res.json({ status: 'UP', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'UP', 
+    timestamp: new Date().toISOString(),
+    authStrategy: config.AUTH_TYPE
+  });
 });
 
 // 4. API Documentation (Swagger)

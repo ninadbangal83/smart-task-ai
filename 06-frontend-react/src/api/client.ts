@@ -12,15 +12,38 @@ apiClient.interceptors.request.use(
     const serverUrl = useAuthStore.getState().serverUrl;
     config.baseURL = serverUrl;
 
+    const strategy = useAuthStore.getState().authStrategy;
     const token = useAuthStore.getState().token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+
+    console.log(`%c[Auth System] Active Strategy: %c${strategy}`,
+      'color: #a855f7; font-weight: bold;',
+      'color: #fbbf24; font-weight: bold; text-decoration: underline;'
+    );
+
+    if (strategy === 'JWT') {
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+        console.log(`%c[Auth System] Appended JWT Token: %c${token.substring(0, 15)}...`,
+          'color: #a855f7; font-weight: bold;',
+          'color: #e9d5ff;'
+        );
+      } else {
+        console.log(`%c[Auth System] %c⚠️ Missing JWT Token for request!`,
+          'color: #a855f7; font-weight: bold;',
+          'color: #fca5a5;'
+        );
+      }
+    } else if (strategy === 'SESSION') {
+      console.log(`%c[Auth System] %c🍪 Sending requests with withCredentials (Cookies automated by Browser)`,
+        'color: #a855f7; font-weight: bold;',
+        'color: #c084fc; font-weight: bold;'
+      );
     }
 
     // Industrial standard client-side request logging
-    console.log(`%c[API Request] %c${config.method?.toUpperCase()} %c${config.url}`, 
-      'color: #3b82f6; font-weight: bold;', 
-      'color: #10b981; font-weight: bold;', 
+    console.log(`%c[API Request] %c${config.method?.toUpperCase()} %c${config.url}`,
+      'color: #3b82f6; font-weight: bold;',
+      'color: #10b981; font-weight: bold;',
       'color: #f59e0b;'
     );
     return config;
@@ -34,9 +57,9 @@ apiClient.interceptors.request.use(
 // Response interceptor for logging & globally handling auth expiration or errors
 apiClient.interceptors.response.use(
   (response) => {
-    console.log(`%c[API Response] %c${response.status} %c${response.config.url}`, 
-      'color: #10b981; font-weight: bold;', 
-      'color: #3b82f6; font-weight: bold;', 
+    console.log(`%c[API Response] %c${response.status} %c${response.config.url}`,
+      'color: #10b981; font-weight: bold;',
+      'color: #3b82f6; font-weight: bold;',
       'color: #6b7280;',
       response.data
     );
@@ -54,9 +77,9 @@ apiClient.interceptors.response.use(
     const data: any = error.response?.data;
     const message = data?.message || error.message || 'An unexpected error occurred';
 
-    console.error(`%c[API Response Error] %c${status || 'NETWORK'} %c${message}`, 
-      'color: #ef4444; font-weight: bold;', 
-      'color: #f59e0b; font-weight: bold;', 
+    console.error(`%c[API Response Error] %c${status || 'NETWORK'} %c${message}`,
+      'color: #ef4444; font-weight: bold;',
+      'color: #f59e0b; font-weight: bold;',
       'color: #6b7280;'
     );
 

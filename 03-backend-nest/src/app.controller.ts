@@ -2,12 +2,17 @@ import { Controller, Get, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import fs from 'fs';
 import path from 'path';
+import { config } from './config/app.config';
 
 @Controller()
 export class AppController {
   @Get('health')
   getHealth() {
-    return { status: 'UP', timestamp: new Date().toISOString() };
+    return { 
+      status: 'UP', 
+      timestamp: new Date().toISOString(),
+      authStrategy: config.AUTH_TYPE
+    };
   }
 
   @Get('api/docs')

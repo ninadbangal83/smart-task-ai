@@ -26,6 +26,7 @@
     "amqplib": "^0.10.5",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.34.8",
+    "dotenv": "^17.4.2",
     "ioredis": "^5.4.2",
     "jsonwebtoken": "^9.0.2",
     "kafkajs": "^2.2.4",

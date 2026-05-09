@@ -24,18 +24,40 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
     else logger.info(logMsg);
   });
 
-  // 2. Global Security Headers (Native Helmet)
+  // 2. Global Security Headers & CORS (Native Helmet + CORS)
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-Auth-Token');
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  res.setHeader('Content-Security-Policy', "default-src 'self'");
   res.setHeader('X-Powered-By', 'SmartTask-Native-Core');
+
+  // Handle pre-flight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    return res.end();
+  }
 
   const { method, url } = req;
 
   try {
+    // 00. Health Check Endpoint (Used by Frontend)
+    if (url === '/health' && method === 'GET') {
+      res.writeHead(200);
+      return res.end(JSON.stringify({ 
+        status: 'UP', 
+        timestamp: new Date().toISOString(),
+        database: config.DB_TYPE,
+        broker: config.BROKER_TYPE,
+        mode: config.NODE_ENV,
+        authStrategy: config.AUTH_TYPE
+      }));
+    }
+
     // 0. API Documentation (Swagger)
     if (url === '/api/docs' && method === 'GET') {
       const docsPath = path.join(process.cwd(), 'src/api/docs/swagger.json');
@@ -45,16 +67,16 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
     }
 
     // 1. Dispatch to Auth Routes (Public)
-    const authHandled = await handleAuthRoutes(req, res);
-    if (authHandled) return;
+    await handleAuthRoutes(req, res);
+    if (res.writableEnded) return;
 
     // 2. Dispatch to Task Routes (Protected)
-    const taskHandled = await handleTaskRoutes(req, res);
-    if (taskHandled) return;
+    await handleTaskRoutes(req, res);
+    if (res.writableEnded) return;
 
     // 3. Dispatch to User/Admin Routes (Mixed)
-    const userHandled = await handleUserRoutes(req, res);
-    if (userHandled) return;
+    await handleUserRoutes(req, res);
+    if (res.writableEnded) return;
     
     // 4. If no route handled the request, it's a 404
     res.writeHead(404);
