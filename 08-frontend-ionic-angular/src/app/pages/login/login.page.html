@@ -1,0 +1,138 @@
+<ion-content [fullscreen]="true" class="login-content-wrapper">
+  <div class="login-viewport">
+    <!-- Background glows -->
+    <div class="blur-glow glow-1 animate-pulse"></div>
+    <div class="blur-glow glow-2 animate-pulse"></div>
+
+    <div class="login-card-container">
+      <div class="card-glow-top"></div>
+
+      <!-- Icon Header -->
+      <div class="card-header-block">
+        <div class="header-icon-badge">
+          <ion-icon name="hardware-chip-outline" class="rotate-on-hover"></ion-icon>
+          <ion-icon name="sparkles-sharp" class="sparkle-icon"></ion-icon>
+        </div>
+        <h1 class="header-title">
+          {{ isRegister ? 'Register Account' : 'Authenticate Identity' }}
+        </h1>
+        <p class="header-desc">
+          {{ isRegister ? 'Join the Multi-Variant Orchestration Core' : 'Sign in to access your universal dashboard' }}
+        </p>
+      </div>
+
+      <!-- Offline Warning Banner -->
+      <div class="offline-warning animate-fade-in" *ngIf="authService.serverHealth() === null">
+        <ion-icon name="shield-alert-outline" class="bounce-warning"></ion-icon>
+        <div class="warning-text">
+          <span class="warning-title">Backend Server Offline</span>
+          <span class="warning-message">
+            The frontend is set to use <code class="code-url">{{ authService.serverUrl() }}</code> but no online listener was detected. Please launch the backend server first.
+          </span>
+        </div>
+      </div>
+
+      <!-- Form Inputs -->
+      <form (submit)="onSubmit($event)" class="login-form">
+        <!-- Name (Register Only) -->
+        <div class="form-group" *ngIf="isRegister">
+          <label for="reg-name">Full Name</label>
+          <div class="input-wrapper">
+            <ion-icon name="person-outline" class="input-icon"></ion-icon>
+            <input 
+              type="text" 
+              id="reg-name" 
+              placeholder="Master Coder" 
+              [(ngModel)]="name"
+              name="name"
+              required
+              [disabled]="isLoading"
+              autocomplete="name"
+            />
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="login-email">Email Address</label>
+          <div class="input-wrapper">
+            <ion-icon name="mail-outline" class="input-icon"></ion-icon>
+            <input 
+              type="email" 
+              id="login-email" 
+              placeholder="admin@smarttask.ai" 
+              [(ngModel)]="email"
+              name="email"
+              required
+              [disabled]="isLoading"
+              autocomplete="email"
+            />
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <div class="input-wrapper">
+            <ion-icon name="lock-closed-outline" class="input-icon"></ion-icon>
+            <input 
+              type="password" 
+              id="login-password" 
+              placeholder="••••••••" 
+              [(ngModel)]="password"
+              name="password"
+              required
+              [disabled]="isLoading"
+              autocomplete="current-password"
+            />
+          </div>
+        </div>
+
+        <!-- Access Role (Register Only) -->
+        <div class="form-group" *ngIf="isRegister">
+          <label>Access Role</label>
+          <div class="role-selector-toggle">
+            <button 
+              type="button" 
+              (click)="role = 'user'" 
+              [class.active]="role === 'user'"
+              class="role-btn">
+              User Account
+            </button>
+            <button 
+              type="button" 
+              (click)="role = 'admin'" 
+              [class.active]="role === 'admin'"
+              class="role-btn">
+              Admin Account
+            </button>
+          </div>
+        </div>
+
+        <!-- Error Panel -->
+        <div class="error-panel animate-fade-in" *ngIf="errorMessage">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>{{ errorMessage }}</span>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="submit-btn" [disabled]="isLoading">
+          <span class="btn-text" *ngIf="!isLoading">
+            {{ isRegister ? 'Register Identity' : 'Authorize Identity' }}
+          </span>
+          <span class="btn-text loading" *ngIf="isLoading">
+            <ion-spinner name="crescent"></ion-spinner>
+            Decrypting Cryptography...
+          </span>
+        </button>
+      </form>
+
+      <!-- Toggle Mode Link -->
+      <div class="toggle-link-container">
+        <button (click)="toggleMode()" class="toggle-mode-btn" [disabled]="isLoading">
+          {{ isRegister ? 'Already have an account? Sign In' : "Don't have an account? Create one" }}
+        </button>
+      </div>
+    </div>
+  </div>
+</ion-content>

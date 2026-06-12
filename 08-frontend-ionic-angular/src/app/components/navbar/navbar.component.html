@@ -1,0 +1,82 @@
+<nav class="app-nav">
+  <div class="nav-container">
+    <!-- Brand / Logo -->
+    <div class="nav-brand">
+      <div class="brand-logo">
+        <ion-icon name="hardware-chip-outline"></ion-icon>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">SmartTask AI</span>
+        <span class="brand-subtitle">Universal Orchestrator</span>
+      </div>
+    </div>
+
+    <!-- Configuration Selectors -->
+    <div class="nav-configs">
+      <!-- Server Port Switcher -->
+      <div class="server-switcher">
+        <button 
+          (click)="setServerUrl('http://localhost:8000')" 
+          [class.active]="authService.serverUrl() === 'http://localhost:8000'"
+          class="switch-btn">
+          <ion-icon name="server-outline"></ion-icon>
+          Laravel (8000)
+        </button>
+        <button 
+          (click)="setServerUrl('http://localhost:3000')" 
+          [class.active]="authService.serverUrl() === 'http://localhost:3000'"
+          class="switch-btn">
+          <ion-icon name="hardware-chip-outline"></ion-icon>
+          Native (3000)
+        </button>
+        <button 
+          (click)="setServerUrl('http://localhost:3001')" 
+          [class.active]="authService.serverUrl() === 'http://localhost:3001'"
+          class="switch-btn">
+          <ion-icon name="server-outline"></ion-icon>
+          Express (3001)
+        </button>
+        <button 
+          (click)="setServerUrl('http://localhost:3002')" 
+          [class.active]="authService.serverUrl() === 'http://localhost:3002'"
+          class="switch-btn">
+          <ion-icon name="cube-outline"></ion-icon>
+          NestJS (3002)
+        </button>
+        <button 
+          (click)="setServerUrl('http://localhost:3003')" 
+          [class.active]="authService.serverUrl() === 'http://localhost:3003'"
+          class="switch-btn">
+          <ion-icon name="layers-outline"></ion-icon>
+          SpringBoot (3003)
+        </button>
+      </div>
+
+      <!-- Auth Strategy Badge -->
+      <div class="badge auth-badge">
+        <ion-icon name="shield-checkmark-outline" class="pulse-icon"></ion-icon>
+        <span class="badge-label">Auth:</span>
+        <span class="badge-value font-mono">{{ authService.authStrategy() }}</span>
+      </div>
+
+      <!-- Health Status Badge -->
+      <div class="badge health-badge" [class.online]="authService.serverHealth() !== null" [class.offline]="authService.serverHealth() === null">
+        <span class="status-dot" [class.pulse]="authService.serverHealth() !== null"></span>
+        <span class="badge-value">
+          {{ authService.isConnecting() ? 'Syncing...' : (authService.serverHealth() ? 'Server UP' : 'Offline') }}
+        </span>
+      </div>
+    </div>
+
+    <!-- User Profile / Logout -->
+    <div class="nav-profile" *ngIf="authService.user() as user">
+      <div class="profile-info">
+        <span class="profile-name">{{ user.name }}</span>
+        <span class="profile-role">Role: <span class="highlight">{{ user.role }}</span></span>
+      </div>
+      <button (click)="logout()" class="logout-btn" title="Logout">
+        <ion-icon name="log-out-outline"></ion-icon>
+      </button>
+    </div>
+  </div>
+</nav>

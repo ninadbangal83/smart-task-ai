@@ -1,0 +1,46 @@
+<form (submit)="onSubmit($event)" class="task-form-container">
+  <div class="form-group">
+    <label for="task-title">Title</label>
+    <div class="input-wrapper">
+      <input 
+        type="text" 
+        id="task-title" 
+        name="title"
+        placeholder="Task title (e.g. Run AI analysis)" 
+        [(ngModel)]="title"
+        required
+        [disabled]="isSubmitting"
+        autocomplete="off"
+      />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="task-desc">Description</label>
+    <div class="input-wrapper">
+      <textarea 
+        id="task-desc" 
+        name="description"
+        placeholder="Brief description of orchestration goal..." 
+        [(ngModel)]="description"
+        [disabled]="isSubmitting"
+        rows="3"
+      ></textarea>
+    </div>
+  </div>
+
+  <div class="error-msg animate-fade-in" *ngIf="errorMessage">
+    ⚠️ {{ errorMessage }}
+  </div>
+
+  <button type="submit" class="submit-btn" [disabled]="isSubmitting || !title.trim()">
+    <span class="btn-content" *ngIf="!isSubmitting">
+      <ion-icon name="add-circle-outline"></ion-icon>
+      Spawn Task Node
+    </span>
+    <span class="btn-content loading" *ngIf="isSubmitting">
+      <ion-spinner name="crescent"></ion-spinner>
+      Queuing Node...
+    </span>
+  </button>
+</form>

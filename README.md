@@ -17,7 +17,9 @@ Follow the folders in sequence (01 to 08) to master the full stack:
 | **05** | `05-backend-java` | Spring Boot | **The Power**: JVM internals and complex multithreading. |
 | **06** | `06-frontend-react` | React (Vite) | **The Interface**: Building a dynamic dashboard. |
 | **07** | `07-frontend-next` | Next.js (App Router) | **The Full-Stack**: Server-side rendering and hydration. |
-| **08** | `08-infra` | Docker / AWS | **The Deployment**: Containerization and CloudOps. |
+| **08** | `07-backend-laravel` | Laravel MVC | **The PHP Standard**: Repositories, Service DI, and thin MVC. |
+| **09** | `08-frontend-ionic-angular` | Ionic + Angular (Signals) | **The Mobile/PWA**: Native component layout and Signal reactivity. |
+| **10** | `09-infra` | Docker / AWS | **The Deployment**: Containerization and CloudOps. |
 
 ---
 

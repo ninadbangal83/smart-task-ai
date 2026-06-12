@@ -1,0 +1,164 @@
+<ion-content [fullscreen]="true" class="dashboard-content-wrapper">
+  <!-- Embedded custom header-navbar -->
+  <app-navbar></app-navbar>
+
+  <div class="dashboard-viewport">
+    <div class="dashboard-layout-container">
+      
+      <!-- 1. Server Telemetry Alert -->
+      <div class="telemetry-wrapper">
+        <app-server-status></app-server-status>
+      </div>
+
+      <!-- 2. Live Task Analytics Dashboard -->
+      <div class="analytics-grid" *ngIf="taskService.stats() as stats">
+        <!-- Total Tasks Card -->
+        <div class="stat-card total-tasks">
+          <div class="stat-main">
+            <span class="stat-label">Total Tasks</span>
+            <span class="stat-number">{{ stats.total }}</span>
+            <span class="stat-sub">Tasks Registered</span>
+          </div>
+          <div class="stat-icon-badge total-badge">
+            <ion-icon name="grid-outline"></ion-icon>
+          </div>
+          <div class="stat-glow"></div>
+        </div>
+
+        <!-- Pending Tasks Card -->
+        <div class="stat-card pending-tasks">
+          <div class="stat-main">
+            <span class="stat-label">Pending Tasks</span>
+            <span class="stat-number warning">{{ stats.pending }}</span>
+            <span class="stat-subwarning">Awaiting Action</span>
+          </div>
+          <div class="stat-icon-badge pending-badge">
+            <ion-icon name="time-outline"></ion-icon>
+          </div>
+          <div class="stat-glow"></div>
+        </div>
+
+        <!-- Completed Tasks Card -->
+        <div class="stat-card completed-tasks">
+          <div class="stat-main">
+            <span class="stat-label">Completed</span>
+            <span class="stat-number success">{{ stats.completed }}</span>
+            <span class="stat-subsuccess">Task Success</span>
+          </div>
+          <div class="stat-icon-badge completed-badge">
+            <ion-icon name="checkbox-outline"></ion-icon>
+          </div>
+          <div class="stat-glow"></div>
+        </div>
+
+        <!-- Completion Progress Card -->
+        <div class="stat-card progress-card">
+          <div class="stat-main pr-progress">
+            <span class="stat-label">Completion Rate</span>
+            <span class="stat-number progress-value">{{ (stats.progress * 100) | number:'1.0-0' }}%</span>
+            
+            <!-- Custom Progress Bar -->
+            <div class="progress-bar-bg">
+              <div 
+                class="progress-bar-fill"
+                [style.width.%]="stats.progress * 100"
+              ></div>
+            </div>
+          </div>
+          <div class="stat-icon-badge progress-badge">
+            <ion-icon name="list-outline"></ion-icon>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Main Workspace Layout -->
+      <div class="workspace-grid">
+        <!-- Left Column: Tasks Feed -->
+        <div class="tasks-feed-column">
+          
+          <!-- Filter and Search Controls -->
+          <div class="controls-bar">
+            <!-- Search Input -->
+            <div class="search-input-wrapper">
+              <ion-icon name="search-outline" class="search-icon"></ion-icon>
+              <input 
+                type="text" 
+                placeholder="Search orchestrations..."
+                [value]="taskService.searchQuery()"
+                (input)="onSearch($event)"
+                class="search-bar-input"
+              />
+            </div>
+
+            <!-- Filter Switcher -->
+            <div class="filter-switch-container">
+              <button 
+                (click)="setFilter('all')" 
+                [class.active]="taskService.filter() === 'all'"
+                class="filter-toggle-btn">
+                <ion-icon name="options-outline"></ion-icon>
+                All
+              </button>
+              <button 
+                (click)="setFilter('pending')" 
+                [class.active]="taskService.filter() === 'pending'"
+                class="filter-toggle-btn pending-active">
+                <ion-icon name="time-outline"></ion-icon>
+                Pending
+              </button>
+              <button 
+                (click)="setFilter('completed')" 
+                [class.active]="taskService.filter() === 'completed'"
+                class="filter-toggle-btn completed-active">
+                <ion-icon name="checkbox-outline"></ion-icon>
+                Completed
+              </button>
+            </div>
+          </div>
+
+          <!-- Server Error Message -->
+          <div class="feed-error-panel animate-fade-in" *ngIf="taskService.error() as err">
+            <ion-icon name="warning-outline"></ion-icon>
+            <span>{{ err }}</span>
+          </div>
+
+          <!-- Loading State -->
+          <div class="feed-loading-state" *ngIf="taskService.isLoading() && taskService.tasks().length === 0">
+            <ion-spinner name="crescent" class="loading-spinner"></ion-spinner>
+            <span class="loading-text">Synchronizing Orchestration Logs...</span>
+          </div>
+
+          <!-- Empty State -->
+          <div 
+            class="feed-empty-state" 
+            *ngIf="!taskService.isLoading() && taskService.filteredTasks().length === 0">
+            <ion-icon name="grid-outline" class="empty-icon"></ion-icon>
+            <h3 class="empty-title">No tasks detected</h3>
+            <p class="empty-desc">
+              {{ taskService.searchQuery() ? 'No results match your search query.' : 'Spawn a new task node to initialize the orchestration pipeline.' }}
+            </p>
+          </div>
+
+          <!-- Tasks Listing Grid -->
+          <div class="tasks-grid" *ngIf="taskService.filteredTasks().length > 0">
+            <app-task-card 
+              *ngFor="let task of taskService.filteredTasks()" 
+              [task]="task"
+            ></app-task-card>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Task Spawner Panel -->
+        <div class="spawner-column">
+          <div class="column-header">
+            <h2 class="col-title">Create Task Node</h2>
+            <p class="col-subtitle">Spawn a new task worker node into the cluster queue.</p>
+          </div>
+          <app-task-form></app-task-form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</ion-content>

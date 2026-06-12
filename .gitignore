@@ -1,7 +1,9 @@
 # Dependency Directories
 **/node_modules/
+**/vendor/
 **/dist/
 **/build/
+**/www/
 **/target/
 **/.next/
 **/out/
@@ -19,6 +21,11 @@
 # Database/Storage (Local development)
 **/tasks.json
 **/db_data/
+**/bootstrap/cache/
+**/storage/framework/
+**/storage/app/
+**/storage/*.key
+**/.phpunit.result.cache
 
 # OS Files
 .DS_Store

@@ -1,0 +1,92 @@
+<div class="task-card-container" [class.completed]="task.status === 'completed'">
+  <!-- Decorative Top Bar -->
+  <div class="card-glow-bar" [class.completed-glow]="task.status === 'completed'"></div>
+
+  <div class="card-main">
+    <!-- Header Block -->
+    <div class="card-header">
+      <button (click)="handleToggleStatus()" class="status-btn" [class.completed-status]="task.status === 'completed'">
+        <ion-icon [name]="task.status === 'completed' ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
+      </button>
+
+      <!-- Title or Title Input -->
+      <div class="title-container">
+        <input 
+          *ngIf="isEditing"
+          type="text"
+          [(ngModel)]="editTitle"
+          class="title-edit-input"
+          (keyup.enter)="handleSave()"
+        />
+        <h3 
+          *ngIf="!isEditing"
+          class="task-title" 
+          [class.completed-title]="task.status === 'completed'">
+          {{ task.title }}
+        </h3>
+      </div>
+
+      <!-- Action Tools -->
+      <div class="action-tools">
+        <!-- Edit Mode Save/Cancel -->
+        <ng-container *ngIf="isEditing">
+          <button (click)="handleSave()" class="tool-btn save-btn" title="Save">
+            <ion-icon name="checkmark-outline"></ion-icon>
+          </button>
+          <button (click)="isEditing = false" class="tool-btn cancel-btn" title="Cancel">
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
+        </ng-container>
+
+        <!-- View Mode Edit/Delete -->
+        <ng-container *ngIf="!isEditing">
+          <button (click)="isEditing = true" class="tool-btn edit-btn" title="Edit">
+            <ion-icon name="create-outline"></ion-icon>
+          </button>
+          <button 
+            (click)="handleDelete()" 
+            [disabled]="isDeleting"
+            [class.disabled-btn]="task.status === 'completed'"
+            class="tool-btn delete-btn" 
+            [title]="task.status === 'completed' ? 'Completed tasks cannot be deleted' : 'Delete'">
+            <ion-icon name="trash-outline"></ion-icon>
+          </button>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Description Block -->
+    <div class="card-description">
+      <textarea 
+        *ngIf="isEditing"
+        [(ngModel)]="editDesc"
+        rows="2"
+        class="desc-edit-input"
+      ></textarea>
+      <p 
+        *ngIf="!isEditing"
+        class="task-desc"
+        [class.completed-desc]="task.status === 'completed'">
+        {{ task.description || 'No description provided.' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Footer Block -->
+  <div class="card-footer">
+    <div class="date-info">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <span>{{ formattedDate }}</span>
+    </div>
+    <div class="status-badge" [class.completed-badge]="task.status === 'completed'">
+      {{ task.status }}
+    </div>
+  </div>
+
+  <!-- Domain Exception Alert Overlay -->
+  <div class="domain-error-overlay animate-fade-in" *ngIf="deleteError">
+    <ion-icon name="alert-triangle-outline" class="bounce-warning"></ion-icon>
+    <span class="overlay-title">Domain Exception Guard</span>
+    <p class="overlay-message">{{ deleteError }}</p>
+  </div>
+</div>
